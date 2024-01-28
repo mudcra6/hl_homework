@@ -1,0 +1,39 @@
+# create_user_and_install_packages.yml
+
+---
+- name: Create user and install packages
+  hosts: webservers
+  become: yes
+  
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+  tasks:
+    - name: Create user hillel
+      user:
+        name: hillel
+        shell: /bin/bash
+        groups: sudo
+        append: yes
+        createhome: yes
+
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: latest
+        update_cache: yes
+    - name: Install git
+      apt:
+        name: git
+        state: latest
+    - name: Install zip
+      apt:
+        name: zip
+        state: latest
+    - name: Ensure nginx service is running and enabled
+      service:
+        name: nginx
+        state: started
+        enabled: yes

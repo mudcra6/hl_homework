@@ -1,0 +1,26 @@
+# remove_user_and_packages.yml
+
+---
+- name: Remove user and packages
+  hosts: webservers
+  become: yes
+
+  tasks:
+    - name: Stop and disable nginx service
+      service:
+        name: nginx
+        state: stopped
+        enabled: no
+
+    - name: Remove nginx, git, zip packages
+      apt:
+        name:
+          - nginx
+          - git
+          - zip
+        state: absent
+
+    - name: Remove user hillel
+      user:
+        name: hillel
+        state: absent
