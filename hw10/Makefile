@@ -7,20 +7,15 @@ all: build run
 
 # Target to clone the Git repository
 clone:
-	git clone $(REPO_URL) app
+	git clone $(REPO_URL)
 
 # Target to build the Docker image
 build: clone
-	docker build -t $(IMAGE_NAME) ./app
+	docker build -t $(IMAGE_NAME)
 
 # Target to run the Docker container
 run:
 	docker run -d -p 5000:5000 $(IMAGE_NAME)
 
-# Target to clean up cloned repository and Docker image
-clean:
-	rm -rf ./app
-	docker rmi $(IMAGE_NAME)
-
 # PHONY targets (targets that are not filenames)
-.PHONY: all clone build run clean
+.PHONY: all clone build run
