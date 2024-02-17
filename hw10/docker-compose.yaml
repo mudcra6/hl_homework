@@ -1,19 +1,12 @@
 version: '3.8'
 
 services:
-  compiler:
+  app:
     build:
-      context: ShortMe-URL-Shortener
-      dockerfile: ShortMe-URL-Shortener/Dockerfile
-      target: compiler
-    container_name: compiler
-  runner:
-    build:
-      context: ShortMe-URL-Shortener
-      dockerfile: ShortMe-URL-Shortener/Dockerfile
-      target: runner
-    container_name: runner
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "5000:5000"
-    depends_on:
-      - compiler
+    environment:
+      FLASK_ENV: development
+    command: flask run --host=0.0.0.0 --port=5000
