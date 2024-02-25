@@ -12,8 +12,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Build Docker Image
-        working-directory: hw10
-        run: |
-          git clone git@github.com:mudcra6/ShortMe-URL-Shortener.git
-          docker build . --file Dockerfile --tag shortme3
+        working-directory: hw11
+        run: docker build . --file hillel_devops/hw10/Dockerfile --tag shortme3
 
