@@ -1,0 +1,3 @@
+[submodule "hw11/ShortMe-URl-Shortener"]
+	path = hw11/ShortMe-URl-Shortener
+	url = https://github.com/mudcra6/ShortMe-URL-Shortener/submodule.git
