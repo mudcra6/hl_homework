@@ -6,7 +6,7 @@ RUN python -m venv /opt/venv
 
 ENV PATH="/opt/venv/bin:$PATH"
 
-COPY requirements.txt /app/requirements.txt
+COPY ShortMe-URL-Shortener/requirements.txt /app/requirements.txt
 
 RUN pip install -r requirements.txt
 
