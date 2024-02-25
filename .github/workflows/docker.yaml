@@ -14,6 +14,6 @@ jobs:
       - name: Build Docker Image
         working-directory: hw10
         run: |
-          git clone git@github.com:yuriipaneiko/ShortMe-URL-Shortener.git
+          git clone git@github.com:mudcra6/ShortMe-URL-Shortener.git
           docker build . --file Dockerfile --tag shortme3
 
