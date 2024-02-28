@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: petclinic
+  labels:
+    app: petclinic
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: petclinic
+  template:
+    metadata:
+      labels:
+        app: petclinic
+    spec:
+      containers:
+      - name: petclinic
+        image: spring-petclinic:3.2.0-SNAPSHOT
+        ports:
+        - containerPort: 8080
+        env:
+          - name: POSTGRES_URL
+            value: jdbc:postgresql://postgres.postgres.svc.local:5432/petclinic
+          - name: POSTGRES_USER
+            value: petclinic
+          - name: POSTGRES_PASS
+            value: petclinic
