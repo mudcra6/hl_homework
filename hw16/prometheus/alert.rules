@@ -1,0 +1,14 @@
+groups:
+- name: example
+  rules:
+
+ ALERT test_container_high_cpu
+  IF sum(rate(container_cpu_usage_seconds_total{name="test_container"}[1m])) / count(node_cpu{mode="system"}) * 100 > 86
+  FOR 1s
+  LABELS { severity = "warning" }
+  ANNOTATIONS {
+    summary= "test_container high CPU usage",
+    description= "test_container CPU usage is {{ humanize $value}}%."
+  }
+
+

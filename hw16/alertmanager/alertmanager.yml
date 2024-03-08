@@ -1,0 +1,17 @@
+route:
+  receiver: 'default'
+  group_wait: 10s
+  group_interval: 5m
+  repeat_interval: 3h
+  routes:
+    - match:
+        alertname: CPUUsageTooHigh
+      receiver: 'notify-telegram'
+      group_wait: 0s
+      group_interval: 1m
+
+receivers:
+- name: 'notify-telegram'
+  telegram_configs:
+  - api_key: '${TELEGRAM_API_KEY}'
+    chat_id: 'test'
