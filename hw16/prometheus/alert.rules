@@ -1,14 +1,22 @@
 groups:
-- name: example
+- name: ContainerCpuAlert
   rules:
+    - alert: CadvisorContainerDown
+      expr: up{job="cadvisor"} == 0
+      labels:
+        severity: 'critical'
+      annotations:
+        summary: 'Alert: Cadvisor container is down'
+        description: 'The Cadvisor container is down or not responding.'
+      
+    - alert: ContainerHighCpuUtilization
+      expr: sum(rate(container_cpu_usage_seconds_total{job="cadvisor"}[1m])) by (container_name) * 100 > 0
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High CPU usage in container"
+        description: "Container {{ $labels.container_name }} is consuming more than 87% CPU."
 
- ALERT test_container_high_cpu
-  IF sum(rate(container_cpu_usage_seconds_total{name="test_container"}[1m])) / count(node_cpu{mode="system"}) * 100 > 3
-  FOR 1s
-  LABELS { severity = "warning" }
-  ANNOTATIONS {
-    summary= "test_container high CPU usage",
-    description= "test_container CPU usage is {{ humanize $value}}%."
-  }
 
 

@@ -1,17 +1,16 @@
+global:
+  resolve_timeout: 10s
+
 route:
-  receiver: 'default'
-  group_wait: 10s
-  group_interval: 5m
-  repeat_interval: 3h
-  routes:
-    - match:
-        alertname: CPUUsageTooHigh
-      receiver: 'notify-telegram'
-      group_wait: 0s
-      group_interval: 1m
+  group_by: ['alertname']
+  group_wait: 3s
+  receiver: 'telegram-bot'
 
 receivers:
-- name: 'notify-telegram'
+- name: 'telegram-bot'
   telegram_configs:
-  - api_key: '657206070:AAEqvb3ZvQcBFQtjx6fiPw0iHBzyAICpCxY'
-    chat_id: '-1002121946181'
+  - bot_token: ${TELEGRAM_TOKEN}
+    api_url: 'https://api.telegram.org'
+    chat_id: ${CHAT_ID}
+    parse_mode: "HTML"
+
