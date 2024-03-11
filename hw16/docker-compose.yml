@@ -1,7 +1,7 @@
 version: "3"
 
 networks:
-  monitor-net:
+  loki:
     driver: bridge
 
 volumes:
@@ -11,61 +11,22 @@ volumes:
 services:
 
   prometheus:
-    image: prom/prometheus:v2.38.0
-    container_name: prometheus
+    image: prom/prometheus
     volumes:
-      - ./prometheus:/etc/prometheus
-      - prometheus_data:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--storage.tsdb.retention.time=200h'
-      - '--web.enable-lifecycle'
-    restart: always
-    ports:
-      - "9090:9090"
+      - "./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
     networks:
-      - monitor-net
-    labels:
-      org.label-schema.group: "monitoring"
+      - loki
+    ports:
+      - 9090:9090
 
-  alertmanager:
-    image: prom/alertmanager:v0.24.0
-    container_name: alertmanager
+  alert-manager:
+    image: prom/alertmanager
     volumes:
-      - ./alertmanager:/etc/alertmanager
-    command:
-      - '--config.file=/etc/alertmanager/alertmanager.yml'
-      - '--storage.path=/alertmanager'
-    restart: always
-    ports:
-      - "9093:9093"
+      - ".alertmanager/alertmanager.yml:/alertmanager/alertmanager.yml"
     networks:
-      - monitor-net
-    labels:
-      org.label-schema.group: "monitoring"
-
-  nodeexporter:
-    image: prom/node-exporter:v1.3.1
-    container_name: nodeexporter
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.rootfs=/rootfs'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
-    restart: always
+      - loki
     ports:
-      - "9100:9100"
-    networks:
-      - monitor-net
-    labels:
-      org.label-schema.group: "monitoring"
+      - 9093:9093
 
   loki:
     image: grafana/loki:2.6.0
@@ -77,19 +38,19 @@ services:
       - "3100:3100"
     restart: always
     networks:
-      - monitor-net
+      - loki
 
   promtail:
-    image: grafana/promtail:2.6.0
+    image: grafana/promtail:2.8.0
     container_name: promtail
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/log:/var/log:ro
       - ./loki/promtail-config.yaml:/etc/promtail/promtail-config.yaml
     command: -config.file=/etc/promtail/promtail-config.yaml
-    restart: always
+#    restart: always
     networks:
-      - monitor-net
+      - loki
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.45.0
@@ -98,21 +59,20 @@ services:
     devices:
       - /dev/kmsg:/dev/kmsg
     volumes:
-      - /:/rootfs:ro
       - /var/run:/var/run:ro
       - /sys:/sys:ro
-      - /var/lib/docker:/var/lib/docker:ro
-      - /cgroup:/cgroup:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     restart: always
     ports:
       - "8080:8080"
     networks:
-      - monitor-net
+      - loki
     labels:
       org.label-schema.group: "monitoring"
 
   grafana:
-    image: grafana/grafana:9.1.1
+    image: grafana/grafana:latest
     container_name: grafana
     volumes:
       - grafana_data:/var/lib/grafana
@@ -124,7 +84,7 @@ services:
     ports:
       - "3000:3000"
     networks:
-      - monitor-net
+      - loki
     labels:
       org.label-schema.group: "monitoring"
 

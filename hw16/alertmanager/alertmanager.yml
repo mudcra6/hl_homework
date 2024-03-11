@@ -13,5 +13,5 @@ route:
 receivers:
 - name: 'notify-telegram'
   telegram_configs:
-  - api_key: '${TELEGRAM_API_KEY}'
-    chat_id: 'test'
+  - api_key: '657206070:AAEqvb3ZvQcBFQtjx6fiPw0iHBzyAICpCxY'
+    chat_id: '-1002121946181'
