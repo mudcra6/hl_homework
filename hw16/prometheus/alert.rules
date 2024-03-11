@@ -10,7 +10,7 @@ groups:
         description: 'The Cadvisor container is down or not responding.'
       
     - alert: ContainerHighCpuUtilization
-      expr: sum(rate(container_cpu_usage_seconds_total{job="cadvisor"}[1m])) by (container_name) * 100 > 0
+      expr: sum(rate(container_cpu_usage_seconds_total{job="cadvisor"}[1m])) by (container_name) * 100 > 87
       for: 1m
       labels:
         severity: warning
