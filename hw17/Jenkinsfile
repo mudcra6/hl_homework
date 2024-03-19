@@ -1,35 +1,14 @@
 pipeline {
-    agent {
-        docker {
-            // Use the same Docker image as the one used in the Dockerfile
-            image 'ubuntu:latest'
-            // Mount the Docker socket inside the container
-            args '-v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
+    agent any
     stages {
-        stage('Build Docker image') {
+        stage('Build image') {
             steps {
+                echo 'Starting to build docker image'
+
                 script {
-                    // Build the Docker image using the Dockerfile
-                    docker.build('worker-img', '-f worker.Dockerfile .')
+                    workerImage = docker.build("worker-img", "-f worker.Dockerfile .")
                 }
             }
-        }
-        stage('Run Docker container') {
-            steps {
-                script {
-                    // Run the Docker container from the built image
-                    docker.image('worker-img').run('--name worker2 -p 2222:22 -d')
-                }
-            }
-        }
-    }
-    post {
-        always {
-            // Clean up by removing the Docker container
-            docker.image('worker-img').stop()
-            docker.image('worker-img').remove()
         }
     }
 }
