@@ -9,7 +9,7 @@ pipeline {
                 }
 
                 script {
-                    workerImage = docker.build("worker-img", "-f worker.Dockerfile .")
+                    workerImage = docker.build("worker-img", "-f hw17/worker.Dockerfile .")
                 }
             }
         }
