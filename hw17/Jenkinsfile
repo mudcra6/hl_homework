@@ -4,7 +4,9 @@ pipeline {
         stage('Build image') {
             steps {
                 echo 'Starting to build docker image'
-                dir("hw17")
+                dir("hw17") {
+                    sh "pwd"
+                }
 
                 script {
                     workerImage = docker.build("worker-img", "-f hw17/worker.Dockerfile .")
