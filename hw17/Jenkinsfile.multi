@@ -1,5 +1,7 @@
 pipeline {
-    agent worker-ubuntu
+    agent {
+        label 'worker-ubuntu'
+    }
     stages {
         stage('Build Docker image') {
             steps {
