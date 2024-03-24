@@ -9,14 +9,15 @@ pipeline {
                         sh "pwd"
                         script {
                             def branchName = env.BRANCH_NAME ?: 'main'
-                            def imageName = "worker_node2:$branchName"
+                            def imageName = "worker_node2"
+                            def imageTag = "$branchName"
 
                             echo "Building Docker image with tag: $imageName"
 
                             sh "docker build -t $imageName -f worker.Dockerfile ."
                             sh "docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD"
-                            sh "docker tag $imageName $imageName"
-                            sh "docker push $imageName"
+                            sh "docker tag $imageName $imageName:$imageTag"
+                            sh "docker push $imageName:$imageTag"
                         }
                     }
                 }
