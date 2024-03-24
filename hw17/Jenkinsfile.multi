@@ -1,0 +1,55 @@
+pipeline {
+    agent any
+    stages {
+        stage('Build Docker image') {
+            steps {
+                echo 'Building Docker image...'
+                script {
+                    def imageName = "jenkins_test"
+                    def imageTag = "latest"
+
+                    // Build Docker image
+                    sh "docker build -t $imageName:$imageTag ."
+
+                    // Check if Docker image build was successful
+                    if (docker.image(imageName).exists()) {
+                        currentBuild.result = 'SUCCESS'
+                        echo "Docker image $imageName:$imageTag built successfully."
+                    } else {
+                        currentBuild.result = 'FAILURE'
+                        error "Failed to build Docker image $imageName:$imageTag."
+                    }
+                }
+            }
+        }
+    }
+    post {
+        success {
+            script {
+                // Send success status to GitHub commit
+                sendGitHubCommitStatus('success')
+            }
+        }
+        failure {
+            script {
+                // Send failure status to GitHub commit
+                sendGitHubCommitStatus('failure')
+            }
+        }
+    }
+}
+
+def sendGitHubCommitStatus(status) {
+    def gitUrl = env.CHANGE_URL
+    def gitSha = env.CHANGE_ID
+
+    withCredentials([usernamePassword(credentialsId: 'github_token', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+        sh """
+            curl -u $USERNAME:$PASSWORD -X POST $gitUrl/statuses/$gitSha -d '{
+                "state": "$status",
+                "context": "Jenkins CI",
+                "description": "Jenkins CI build $status"
+            }'
+        """
+    }
+}
