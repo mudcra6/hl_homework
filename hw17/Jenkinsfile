@@ -8,7 +8,7 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKERHUB_USERNAME', passwordVariable: 'DOCKERHUB_PASSWORD')]) {
                         sh "pwd"
                         script {
-                            def branchName = env.BRANCH_NAME ?: 'main'
+                            def branchName = env.GIT_BRANCH ?: 'main'
                             def imageName = "worker_node2"
                             def imageTag = "$branchName"
 
