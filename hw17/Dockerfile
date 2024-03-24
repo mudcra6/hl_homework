@@ -3,7 +3,7 @@ FROM jenkins/jenkins:latest
 # Set the user to root to perform installation
 USER root
 
-USER jenkins
+USE jenkins
 
 ENV JENKINS_HOME=/var/jenkins_home
 
