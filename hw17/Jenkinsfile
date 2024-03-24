@@ -15,7 +15,7 @@ pipeline {
 
                             echo "Building Docker image with tag: $imageName"
 
-                            sh "docker build -t $imageName -f worker.Dockerfile ."
+                            sh "docker build -t $imageName:$imageTag -f worker.Dockerfile ."
                             sh "docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD"
                             sh "docker tag $imageName:$imageTag $DOCKERHUB_USERNAME/$imageName:$imageTag"
                             sh "docker push $DOCKERHUB_USERNAME/$imageName:$imageTag"
