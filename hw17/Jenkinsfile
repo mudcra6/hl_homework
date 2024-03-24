@@ -9,6 +9,7 @@ pipeline {
                         sh "pwd"
                         script {
                             def branchName = env.GIT_BRANCH ?: 'main'
+                            branchName = branchName.replaceAll(/^origin\//, '')
                             def imageName = "worker_node2"
                             def imageTag = "$branchName"
 
