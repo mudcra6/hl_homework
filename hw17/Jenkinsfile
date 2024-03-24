@@ -16,8 +16,8 @@ pipeline {
 
                             sh "docker build -t $imageName -f worker.Dockerfile ."
                             sh "docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD"
-                            sh "docker tag $imageName $imageName:$imageTag"
-                            sh "docker push $imageName:$imageTag"
+                            sh "docker tag $imageTag $DOCKERHUB_USERNAME/$imageName:$imageTag"
+                            sh "docker push $DOCKERHUB_USERNAME/$imageName:$imageTag"
                         }
                     }
                 }
