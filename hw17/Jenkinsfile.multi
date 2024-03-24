@@ -15,7 +15,8 @@ pipeline {
                         sh "docker build -t $imageName:$imageTag ."
 
                         // Check if Docker image build was successful
-                        if (docker.image(imageName).exists()) {
+                        def dockerImage = sh(script: "docker images -q $imageName:$imageTag", returnStdout: true).trim()
+                        if (dockerImage) {
                             currentBuild.result = 'SUCCESS'
                             echo "Docker image $imageName:$imageTag built successfully."
                         } else {
