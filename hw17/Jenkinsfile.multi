@@ -28,33 +28,3 @@ pipeline {
             }
         }
     }
-    post {
-        success {
-            script {
-                // Send success status to GitHub commit
-                sendGitHubCommitStatus('success')
-            }
-        }
-        failure {
-            script {
-                // Send failure status to GitHub commit
-                sendGitHubCommitStatus('failure')
-            }
-        }
-    }
-}
-
-def sendGitHubCommitStatus(status) {
-    def gitUrl = env.CHANGE_URL
-    def gitSha = env.CHANGE_ID
-
-    withCredentials([usernamePassword(credentialsId: 'github_token', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-        sh """
-            curl -u $USERNAME:$PASSWORD -X POST $gitUrl/statuses/$gitSha -d '{
-                "state": "$status",
-                "context": "Jenkins CI",
-                "description": "Jenkins CI build $status"
-            }'
-        """
-    }
-}
