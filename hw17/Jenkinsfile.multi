@@ -31,15 +31,62 @@ pipeline {
     post {
         success {
             script {
-                withCredentials([usernamePassword(credentialsId: 'github_token', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    sh 'curl -X POST --user $USERNAME:$PASSWORD --data  "{\\"state\\": \\"success\\"}" --url $GITHUB_API_URL/statuses/$GIT_COMMIT'
+                withCredentials([string(credentialsId: 'your_credentials_id', variable: 'githubToken')]) {
+                    def repoOwner = "OWNER"
+                    def repoName = "REPO"
+                    def commitSHA = env.GIT_COMMIT
+
+                    def curlCmd = """
+                        curl -L \\
+                          -X POST \\
+                          -H 'Accept: application/vnd.github+json' \\
+                          -H 'Authorization: Bearer ${githubToken}' \\
+                          -H 'X-GitHub-Api-Version: 2022-11-28' \\
+                          https://api.github.com/repos/${repoOwner}/${repoName}/statuses/${commitSHA} \\
+                          -d '{"state":"success","target_url":"https://example.com/build/status","description":"The build succeeded!","context":"continuous-integration/jenkins"}'
+                    """
+
+                    sh curlCmd
                 }
             }
         }
         failure {
             script {
-                withCredentials([usernamePassword(credentialsId: 'github_token', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    sh 'curl -X POST --user $USERNAME:$PASSWORD --data  "{\\"state\\": \\"failure\\"}" --url $GITHUB_API_URL/statuses/$GIT_COMMIT'
+                withCredentials([string(credentialsId: 'github_token', variable: 'githubToken')]) {
+                    def repoOwner = "mudcra6"
+                    def repoName = "hl_homework"
+                    def commitSHA = env.GIT_COMMIT
+
+                    def curlCmd = """
+                        curl -L \\
+                          -X POST \\
+                          -H 'Accept: application/vnd.github+json' \\
+                          -H 'Authorization: Bearer ${githubToken}' \\
+                          -H 'X-GitHub-Api-Version: 2022-11-28' \\
+                          https://api.github.com/repos/${repoOwner}/${repoName}/statuses/${commitSHA} \\
+                          -d '{"state":"failure","target_url":"https://example.com/build/status","description":"The build failed!","context":"continuous-integration/jenkins"}'
+                    """
+                    sh curlCmd
+            }
+        }
+        failure {
+            script {
+                def githubToken = "<YOUR-TOKEN>"
+                def repoOwner = "OWNER"
+                def repoName = "REPO"
+                def commitSHA = env.GIT_COMMIT
+
+                def curlCmd = """
+                    curl -L \\
+                      -X POST \\
+                      -H 'Accept: application/vnd.github+json' \\
+                      -H 'Authorization: Bearer ${githubToken}' \\
+                      -H 'X-GitHub-Api-Version: 2022-11-28' \\
+                      https://api.github.com/repos/${repoOwner}/${repoName}/statuses/${commitSHA} \\
+                      -d '{"state":"failure","target_url":"https://example.com/build/status","description":"The build failed!","context":"continuous-integration/jenkins"}'
+                """
+
+                sh curlCmd
                 }
             }
         }
