@@ -31,7 +31,7 @@ pipeline {
     post {
         success {
             script {
-                withCredentials([string(credentialsId: 'your_credentials_id', variable: 'githubToken')]) {
+                withCredentials([string(credentialsId: 'github_token', variable: 'githubToken')]) {
                     def repoOwner = "OWNER"
                     def repoName = "REPO"
                     def commitSHA = env.GIT_COMMIT
