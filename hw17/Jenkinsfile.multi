@@ -1,23 +1,28 @@
 pipeline {
-    agent any
+    agent {
+        label 'worker-ubuntu'
+    }
     stages {
         stage('Build Docker image') {
             steps {
                 echo 'Building Docker image...'
-                script {
-                    def imageName = "jenkins_test"
-                    def imageTag = "latest"
+                dir("hw17") {
+                    script {
+                        def imageName = "jenkins_test"
+                        def imageTag = "latest"
 
-                    // Build Docker image
-                    sh "docker build -t $imageName:$imageTag ."
+                        // Build Docker image
+                        sh "docker build -t $imageName:$imageTag ."
 
-                    // Check if Docker image build was successful
-                    if (docker.image(imageName).exists()) {
-                        currentBuild.result = 'SUCCESS'
-                        echo "Docker image $imageName:$imageTag built successfully."
-                    } else {
-                        currentBuild.result = 'FAILURE'
-                        error "Failed to build Docker image $imageName:$imageTag."
+                        // Check if Docker image build was successful
+                        def dockerImage = sh(script: "docker images -q $imageName:$imageTag", returnStdout: true).trim()
+                        if (dockerImage) {
+                            currentBuild.result = 'SUCCESS'
+                            echo "Docker image $imageName:$imageTag built successfully."
+                        } else {
+                            currentBuild.result = 'FAILURE'
+                            error "Failed to build Docker image $imageName:$imageTag."
+                        }
                     }
                 }
             }
@@ -26,30 +31,44 @@ pipeline {
     post {
         success {
             script {
-                // Send success status to GitHub commit
-                sendGitHubCommitStatus('success')
+                withCredentials([string(credentialsId: 'git_token', variable: 'githubToken')]) {
+                    def repoOwner = "mudcra6"
+                    def repoName = "hl_homework"
+                    def commitSHA = env.GIT_COMMIT
+
+                    def curlCmd = """
+                        curl -L \\
+                          -X POST \\
+                          -H 'Accept: application/vnd.github+json' \\
+                          -H 'Authorization: Bearer ${githubToken}' \\
+                          -H 'X-GitHub-Api-Version: 2022-11-28' \\
+                          https://api.github.com/repos/${repoOwner}/${repoName}/statuses/${commitSHA} \\
+                          -d '{"state":"success","target_url":"https://example.com/build/status","description":"The build succeeded!","context":"continuous-integration/jenkins"}'
+                    """
+
+                    sh curlCmd
+                }
             }
         }
         failure {
             script {
-                // Send failure status to GitHub commit
-                sendGitHubCommitStatus('failure')
+                withCredentials([string(credentialsId: 'git_token', variable: 'githubToken')]) {
+                    def repoOwner = "mudcra6"
+                    def repoName = "hl_homework"
+                    def commitSHA = env.GIT_COMMIT
+
+                    def curlCmd = """
+                        curl -L \\
+                          -X POST \\
+                          -H 'Accept: application/vnd.github+json' \\
+                          -H 'Authorization: Bearer ${githubToken}' \\
+                          -H 'X-GitHub-Api-Version: 2022-11-28' \\
+                          https://api.github.com/repos/${repoOwner}/${repoName}/statuses/${commitSHA} \\
+                          -d '{"state":"failure","target_url":"https://example.com/build/status","description":"The build failed!","context":"continuous-integration/jenkins"}'
+                    """
+                    sh curlCmd
+                }
             }
         }
-    }
-}
-
-def sendGitHubCommitStatus(status) {
-    def gitUrl = env.CHANGE_URL
-    def gitSha = env.CHANGE_ID
-
-    withCredentials([usernamePassword(credentialsId: 'github_token', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-        sh """
-            curl -u $USERNAME:$PASSWORD -X POST $gitUrl/statuses/$gitSha -d '{
-                "state": "$status",
-                "context": "Jenkins CI",
-                "description": "Jenkins CI build $status"
-            }'
-        """
     }
 }
